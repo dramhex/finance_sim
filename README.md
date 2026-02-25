@@ -26,17 +26,18 @@ finance_sim/
 from simulator import GBMSimulator
 from optimizer import LSTPOptimizer
 
-# Run simulation
+# run GBM simulation
 sim = GBMSimulator(s0=50000, mu=0.002, sigma=0.05, n_steps=100, n_sims=1000)
 sim.run_simulation()
 sim.plot_simulation()
 
-# Optimize strategy
+# search for the best stop-loss / take-profit pair
 optimizer = LSTPOptimizer(sim, sl_min=0.5, sl_max=0.95, tp_min=1.05, tp_max=2.0)
-optimizer.optimize()
+best_sl, best_tp = optimizer.optimize()
+print(f"best SL={best_sl}, best TP={best_tp}, win rate={optimizer.best_win_rate:.2%}")
 optimizer.plot_sharpe_ratio()
+optimizer.plot_optimal_equity_curve()
 ```
-
 ## Example Outputs
 
 Below are sample visualizations produced by the simulator and optimizer.

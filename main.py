@@ -3,30 +3,30 @@ from optimizer import LSTPOptimizer
 import matplotlib.pyplot as plt
 import numpy as np
 
-sim_bitcoin = GBMSimulator(s0=50000, mu=0.002, sigma=0.05, n_steps=100, n_sims=1000)
-sim_bitcoin.run_simulation()
+def main() -> None:
+    """Example script demonstrating simulator and optimizer usage."""
 
-sim_bitcoin.plot_simulation()
-sim_bitcoin.plot_result_distribution()
+    # simulate bitcoin trajectories
+    sim_bitcoin = GBMSimulator(s0=50000, mu=0.002, sigma=0.05, n_steps=100, n_sims=1000)
+    sim_bitcoin.run_simulation()
 
-prices_with_sl_tp = sim_bitcoin.apply_sl_tp(stop_loss=40000, take_profit=70000)
+    # visualizations of raw simulation
+    sim_bitcoin.plot_simulation()
+    sim_bitcoin.plot_result_distribution()
 
-optimizer = LSTPOptimizer(sim_bitcoin, sl_min=0.5, sl_max=0.95, tp_min=1.05, tp_max=4, step=0.05, fee_rate=0.005)
-optimizer.calculate_metrics()
-optimizer.get_optimized_params()
-print(optimizer.best_win_rate)
-print(optimizer.best_sl, optimizer.best_tp)
+    # optimize SL/TP grid and display metrics
+    optimizer = LSTPOptimizer(
+        sim_bitcoin, sl_min=0.5, sl_max=0.95, tp_min=1.05, tp_max=4, step=0.05, fee_rate=0.005
+    )
+    best_sl, best_tp = optimizer.optimize()
+    print(
+        f"Optimal SL={best_sl:.3f}, TP={best_tp:.3f}, win rate={optimizer.best_win_rate:.2%}"
+    )
 
-equity_curves = sim_bitcoin.apply_sl_tp(
-    stop_loss = optimizer.best_sl * sim_bitcoin.s0, 
-    take_profit = optimizer.best_tp * sim_bitcoin.s0
-)
+    # plot results from optimizer
+    optimizer.plot_sharpe_ratio()
+    optimizer.plot_optimal_equity_curve()
 
-average_equity_curve = equity_curves.mean(axis=1)
 
-plt.figure(figsize=(10, 5))
-plt.plot(average_equity_curve, label="Équité Moyenne (Optimisée)", color="gold")
-plt.axhline(y=sim_bitcoin.s0, color="red", linestyle="--", label="Capital Initial")
-plt.title("Évolution du Capital Moyen - Stratégie Optimale")
-plt.legend()
-plt.show()
+if __name__ == "__main__":
+    main()
