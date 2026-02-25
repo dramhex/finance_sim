@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class GBMSimulator:
-    def __init__(self, s0, mu, sigma, n_steps = 100, n_sims = 1, stop_loss = 0, take_profit = np.inf):
+    def __init__(self, s0, mu, sigma, n_steps=100, n_sims=1, stop_loss=0, take_profit=np.inf):
         self.s0 = s0
         self.mu = mu
         self.sigma = sigma
@@ -18,23 +18,22 @@ class GBMSimulator:
         gross_prices = 1 + self.mu + (self.sigma*self.epsilon)
         prices_series = self.s0 * np.cumprod(gross_prices, axis=0)
 
-        if self.stop_loss > 0 or self.take_profit < np.inf: 
-            mask_sl = prices_series < self.stop_loss
-            mask_tp = prices_series >= self.take_profit
-            mask_trigger = mask_tp | mask_sl
-            # Get index of first impact
-            first_exit = np.argmax(mask_trigger, axis=0)
-            # Get price at this exact time
-            exit_prices = prices_series[first_exit, np.arange(self.n_sims)]
-            # We apply the correct closing prices (SL or TP)
-            closing_prices = np.where(exit_prices <= self.stop_loss, self.stop_loss, self.take_profit)
-            # Accumulate True on TP or SL mask
-            persistent_mask = np.maximum.accumulate(mask_trigger, axis=0)
-            # Apply closing prices
-            prices_series = np.where(persistent_mask, closing_prices, prices_series)
-
         self.prices_series = prices_series
-        return prices_series
+    
+    def apply_sl_tp(self, stop_loss=0, take_profit=np.inf):
+        prices = self.prices_series.copy()
+
+        mask_sl = prices < stop_loss
+        mask_tp = prices >= take_profit
+        mask_trigger = mask_sl | mask_tp
+
+        first_exit = np.argmax(mask_trigger, axis=0)
+        exit_prices = prices[first_exit, np.arange(self.n_sims)]
+        closing_prices = np.where(exit_prices <= stop_loss, stop_loss, take_profit)
+
+        persistent_mask = np.maximum.accumulate(mask_trigger, axis=0)
+
+        return np.where(persistent_mask, closing_prices, prices)
     
     @property
     def expected_wealth(self):
@@ -74,5 +73,3 @@ class GBMSimulator:
         plt.ylabel("Nombre d'occurences")
         plt.grid(True)
         plt.show()
-
-    
