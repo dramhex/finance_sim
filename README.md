@@ -55,7 +55,7 @@ Below are sample visualizations produced by the simulator and optimizer.
 ### GBMSimulator
 - `run_simulation()`: Generate price paths
 - `apply_sl_tp()`: Apply exit rules
-- Properties: `expected_wealth`, `std_dev`, `loss_probability`, `var`
+- Properties: `expected_wealth`, `std_dev`, `loss_probability`, `var (value at risk)`
 
 ### LSTPOptimizer
 - `optimize()`: Grid search over SL/TP parameters
