@@ -27,6 +27,8 @@ def main() -> None:
     optimizer.plot_sharpe_ratio()
     optimizer.plot_optimal_equity_curve()
 
+    optimizer.calculate_drowdown()
+
 
 if __name__ == "__main__":
     main()

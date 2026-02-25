@@ -22,6 +22,7 @@ class LSTPOptimizer:
         self.best_sl = None
         self.best_tp = None
         self.fee_rate = fee_rate
+        self.average_equity = None
 
     def calculate_metrics(self):
         # compute returns and sharpe for each grid point
@@ -61,13 +62,17 @@ class LSTPOptimizer:
 
     @property
     def best_win_rate(self):
-        if self.best_returns is None:
-            raise RuntimeError("Run optimize() first")
         return (self.best_returns > 0).mean()
 
+    def calculate_drowdown(self) -> np.ndarray:
+        peak = np.maximum.accumulate(self.average_equity)
+        drawdown = (peak - self.average_equity) / peak
+        # Le pire scénario historique en pourcentage
+        max_dd = np.max(drawdown)
+        print(f"Maximum Drawdown : {max_dd * 100:.2f}%")
+        return drawdown
+
     def plot_sharpe_ratio(self):
-        if self.sharpe_ratio is None:
-            raise RuntimeError("Run optimize() first")
         data = self.sharpe_ratio.reshape(self.SL_grid.shape)
         plt.imshow(data,
                    extent=[self.sl_range.min(), self.sl_range.max(),
@@ -80,12 +85,10 @@ class LSTPOptimizer:
         plt.show()
 
     def plot_optimal_equity_curve(self):
-        if self.best_sl is None or self.best_tp is None:
-            raise RuntimeError("Run optimize() first")
         eq = self.simulator.apply_sl_tp(self.best_sl * self.simulator.s0,
                                         self.best_tp * self.simulator.s0)
-        avg = eq.mean(axis=1)
-        plt.plot(avg)
+        self.average_equity = eq.mean(axis=1)
+        plt.plot(self.average_equity)
         plt.axhline(self.simulator.s0, color="red", linestyle="--")
         plt.title("Average equity (optimal)")
         plt.show()
