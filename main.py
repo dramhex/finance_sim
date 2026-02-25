@@ -7,7 +7,7 @@ def main() -> None:
     """Example script demonstrating simulator and optimizer usage."""
 
     # simulate bitcoin trajectories
-    sim_bitcoin = GBMSimulator(s0=50000, mu=0.002, sigma=0.05, n_steps=100, n_sims=1000)
+    sim_bitcoin = GBMSimulator(s0=50000, mu=0.001, sigma=0.03, n_steps=365, n_sims=1000)
     sim_bitcoin.run_simulation()
 
     # visualizations of raw simulation
