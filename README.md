@@ -37,6 +37,19 @@ optimizer.optimize()
 optimizer.plot_sharpe_ratio()
 ```
 
+## Example Outputs
+
+Below are sample visualizations produced by the simulator and optimizer.
+
+### Monte Carlo Simulation (Example 2)
+
+![Monte Carlo Simulation 2](figures/monte_carlo_2.png)
+
+### Sharpe Ratio Heatmap
+
+![Sharpe Ratio Heatmap](figures/sharpe_ratio_heatmap.png)
+
+
 ## API Overview
 
 ### GBMSimulator
